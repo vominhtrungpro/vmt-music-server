@@ -34,23 +34,9 @@ async def select_from_music_queue():
     finally:
         connection.close()
 
-
 async def handler(websocket, path):
     while True:
-        try:
-            if not websocket.open:
-                print("WebSocket not connected, reconnecting...")
-                await asyncio.sleep(5)
-                continue
-        except websockets.exceptions.ConnectionClosedOK:
-            print("Connection closed, reconnecting...")
-            await asyncio.sleep(5) 
-            continue
-        except Exception as e:
-            print(f"Error: {e}")
-            break 
-        else: 
-            print("Reconnection successful")
+        if websocket.open:
             result = await select_from_music_queue()
             if result:
                 print(result['url'])
@@ -58,10 +44,7 @@ async def handler(websocket, path):
 
         await asyncio.sleep(10)
 
-
-
-
-start_server = websockets.serve(handler, "localhost", 8765)
+start_server = websockets.serve(handler, "192.168.1.12", 8765)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
